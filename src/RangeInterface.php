@@ -17,20 +17,23 @@ interface RangeInterface
 {
     public function __toString(): string;
 
+    /// Get lower bound
     public function getMin();
 
+    /// Get upper bound
     public function getMax();
 
     /**
-     * @breief Whether there is any lower or upper bound defined
+     * @brief Whether there is any lower or upper bound defined
      *
-     * This does not include bounds imposed by the data type.
+     * This does not take into account bounds imposed by the underlying data
+     * type itself.
      */
     public function isDefined(): bool;
 
-    /// Whether there a lower and an upper bound
+    /// Whether there is a lower and an upper bound
     public function isBounded(): bool;
 
-    /// Whether the range is one exact value
+    /// Whether the range consists of one exact value
     public function isExactValue(): bool;
 }

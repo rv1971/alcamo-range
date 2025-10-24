@@ -61,9 +61,9 @@ class NonNegativeRange implements RangeInterface
 
 
     /**
-     * @param $min Minimum (nonnegative integer)
+     * @param $min Minimum (nonnegative integer or `null`).
      *
-     * @param $max Maximum (nonnegative integer or null)
+     * @param $max Maximum (nonnegative integer or `null`).
      */
     public function __construct(?int $min = null, ?int $max = null)
     {
@@ -92,7 +92,7 @@ class NonNegativeRange implements RangeInterface
     }
 
     /**
-     * @brief Whether there is an explicit lower or upper bound
+     * @copydoc alcamo::range::RangeInterface::isBounded()
      *
      * A lower bound of 0 is not taken into account since this is implied by
      * the underlying data type of nonnegative integer. This implies that
@@ -103,7 +103,11 @@ class NonNegativeRange implements RangeInterface
         return $this->min_ || isset($this->max_);
     }
 
-    /// Whether $value is contained in the defined range
+    /**
+     * @brief Whether $value is contained in the defined range
+     *
+     * Both bounds (if finite) are included in the range.
+     */
     public function contains(int $value): bool
     {
         return $this->min_ <= $value

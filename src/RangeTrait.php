@@ -28,26 +28,31 @@ trait RangeTrait
         return "{$this->min_}-{$this->max_}";
     }
 
+    /** @copydoc alcamo::range::RangeInterface::getMin() */
     public function getMin()
     {
         return $this->min_;
     }
 
+    /** @copydoc alcamo::range::RangeInterface::getMax() */
     public function getMax()
     {
         return $this->max_;
     }
 
+    /** @copydoc alcamo::range::RangeInterface::isDefined() */
     public function isDefined(): bool
     {
         return isset($this->min_) || isset($this->max_);
     }
 
+    /** @copydoc alcamo::range::RangeInterface::isBounded() */
     public function isBounded(): bool
     {
         return isset($this->min_) && isset($this->max_);
     }
 
+    /** @copydoc alcamo::range::RangeInterface::isExactValue() */
     public function isExactValue(): bool
     {
         return isset($this->min_) && $this->min_ === $this->max_;
