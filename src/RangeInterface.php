@@ -23,6 +23,9 @@ interface RangeInterface
     /// Get upper bound
     public function getMax();
 
+    /// Get 2-element array
+    public function getMinMax(): array;
+
     /**
      * @brief Whether there is any lower or upper bound defined
      *

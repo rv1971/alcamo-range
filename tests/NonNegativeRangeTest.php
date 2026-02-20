@@ -30,6 +30,11 @@ class NonNegativeRangeTest extends TestCase
 
         $this->assertSame($expectedMax, $range->getMax());
 
+        $this->assertSame(
+            [ $expectedMin, $expectedMax ],
+            $range->getMinMax()
+        );
+
         $this->assertSame($expectedString, (string)$range);
 
         $this->assertSame($expectedIsDefined, $range->isDefined());

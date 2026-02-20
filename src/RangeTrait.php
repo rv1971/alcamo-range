@@ -40,6 +40,13 @@ trait RangeTrait
         return $this->max_;
     }
 
+    /** @copydoc alcamo::range::RangeInterface::getMinMax() */
+    public function getMinMax(): array
+    {
+        return [ $this->min_, $this->max_ ];
+    }
+
+
     /** @copydoc alcamo::range::RangeInterface::isDefined() */
     public function isDefined(): bool
     {
