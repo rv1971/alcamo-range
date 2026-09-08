@@ -13,53 +13,8 @@ use alcamo\exception\{OutOfRange, SyntaxError};
  *
  * @date Last reviewed 2025-10-22
  */
-class NonNegativeRange implements RangeInterface
+class NonNegativeRange extends AbstractRange
 {
-    use RangeTrait;
-
-    /**
-     * @brief Create from string.
-     *
-     * Supports an empty string or the syntax `<min>[-[<max>]]`.
-     */
-    public static function newFromString(string $str): self
-    {
-        /** Ignore surrounding whitespace. */
-        $str = trim($str);
-
-        /** The empty string represents the range [0,∞[. */
-        if ($str == '') {
-            return new static();
-        }
-
-        /** @throw alcamo::exception::SyntaxError if the input is
-         *  syntactically wrong. */
-        if (
-            !preg_match(
-                '/^(\d+)(\s*-\s*(\d+)?)?$/',
-                $str,
-                $matches,
-                PREG_UNMATCHED_AS_NULL
-            )
-        ) {
-            throw (new SyntaxError())->setMessageContext(
-                [
-                    'inData' => $str,
-                    'extraMessage' => 'not a valid nonnegative range'
-                ]
-            );
-        }
-
-        $min = intval($matches[1]);
-
-        $max = isset($matches[3])
-            ? intval($matches[3])
-            : (isset($matches[2]) ? null : $min);
-
-        return new static($min, $max);
-    }
-
-
     /**
      * @param $min Minimum (nonnegative integer or `null`).
      *
@@ -92,7 +47,7 @@ class NonNegativeRange implements RangeInterface
     }
 
     /**
-     * @copydoc alcamo::range::RangeInterface::isBounded()
+     * @copydoc alcamo::range::RangeInterface::isDefined()
      *
      * A lower bound of 0 is not taken into account since this is implied by
      * the underlying data type of nonnegative integer. This implies that
@@ -103,14 +58,32 @@ class NonNegativeRange implements RangeInterface
         return $this->min_ || isset($this->max_);
     }
 
-    /**
-     * @brief Whether $value is contained in the defined range
-     *
-     * Both bounds (if finite) are included in the range.
-     */
-    public function contains(int $value): bool
+    public function contains($value): bool
     {
+        $value = (int)$value;
+
         return $this->min_ <= $value
             && (!isset($this->max_) || $value <= $this->max_);
+    }
+
+    protected static function splitString(string $str): array
+    {
+        $a = parent::splitString($str);
+
+        if (
+            isset($a[0]) && !ctype_digit($a[0])
+                || isset($a[1]) && !ctype_digit($a[1])
+        ) {
+            /** @throw alcamo::exception::SyntaxError if the range limits are
+             *  not valid decimal integers. */
+            throw (new SyntaxError())->setMessageContext(
+                [
+                    'inData' => $str,
+                    'extraMessage' => 'not a valid nonnegative range'
+                ]
+            );
+        }
+
+        return $a;
     }
 }

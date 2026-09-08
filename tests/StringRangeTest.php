@@ -3,7 +3,7 @@
 namespace alcamo\range;
 
 use PHPUnit\Framework\TestCase;
-use alcamo\exception\{OutOfRange, SyntaxError};
+use alcamo\exception\OutOfRange;
 
 class StringRangeTest extends TestCase
 {

@@ -39,4 +39,11 @@ interface RangeInterface
 
     /// Whether the range consists of one exact value
     public function isExactValue(): bool;
+
+    /**
+     * @brief Whether $value is contained in the defined range
+     *
+     * Both bounds (if defined) are included in the range.
+     */
+    public function contains($value): bool;
 }

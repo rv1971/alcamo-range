@@ -13,38 +13,8 @@ use alcamo\exception\OutOfRange;
  *
  * @date Last reviewed 2026-09-08
  */
-class StringRange implements RangeInterface
+class StringRange extends AbstractRange
 {
-    use RangeTrait;
-
-    /**
-     * @brief Create range from string
-     *
-     * - "" and "-" represent the range of all strings.
-     * - "x" represents the range ["x", "x"].
-     * - "x-y" represents the range ["x", "y"].
-     * - "-x" represents the range ["", "x"].
-     * - "x-" represents the range of strings greater or equal to "x".
-     */
-    public static function newFromString(string $str)
-    {
-        if ($str == '') {
-            return new static();
-        }
-
-        $a = explode('-', $str);
-
-        if (count($a) == 1) {
-            return new static($a[0], $a[0]);
-        }
-
-        if ($a[1] == '') {
-            $a[1] = null;
-        }
-
-        return new static(...$a);
-    }
-
     public function __construct(?string $min = null, ?string $max = null)
     {
         /** @throw alcamo::exception::OutOfRange if $max is less than $min. */
@@ -61,14 +31,21 @@ class StringRange implements RangeInterface
         $this->max_ = $max;
     }
 
+    /**
+     * @copydoc alcamo::range::RangeInterface::isBounded()
+     *
+     * An empty string as a lower bound is not taken into account since this
+     * is implied by the underlying data type.
+     */
     public function isDefined(): bool
     {
         return $this->min_ != '' || isset($this->max_);
     }
 
-    /// Whether $value is contained in the defined range
-    public function contains(string $value): bool
+    public function contains($value): bool
     {
+        $value = (string)$value;
+
         return $this->min_ <= $value
             && (!isset($this->max_) || $value <= $this->max_);
     }
