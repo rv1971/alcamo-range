@@ -46,7 +46,6 @@ trait RangeTrait
         return [ $this->min_, $this->max_ ];
     }
 
-
     /** @copydoc alcamo::range::RangeInterface::isDefined() */
     public function isDefined(): bool
     {
