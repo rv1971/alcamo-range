@@ -106,4 +106,52 @@ class IntegerRangeTest extends TestCase
             'both-4'  => [ '-30:20', -31, false ]
         ];
     }
+
+    /**
+     * @dataProvider intersectsProvider
+     */
+    public function testIntersects($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            IntegerRange::newFromString($range1)
+                ->intersects(IntegerRange::newFromString($range2))
+        );
+    }
+
+    public function intersectsProvider(): array
+    {
+        return [
+            [ '', '', true ],
+            [ '', '-1:', true ],
+            [ '', ':2', true ],
+            [ '', '-1:2', true ],
+            [ '', '42', true ],
+            [ '-1:', ':2', true ],
+            [ '-1:', '2:', true ],
+            [ '-1:', '2:3', true ],
+            [ '-3:', '-1', true ],
+            [ '-3:', '-4', false ],
+            [ '2:', ':3', true ],
+            [ '2:', ':1', false ],
+            [ '2:', '-3:1', false ],
+            [ ':2', ':-12', true ],
+            [ ':2', '-2:-1', true ],
+            [ ':2', '3:4', false ],
+            [ ':-3', '-4', true ],
+            [ ':-3', '-2', false ],
+            [ '-3:-1', '-2:2', true ],
+            [ '-3:-1', '0:2', false ],
+            [ '-3:-1', '-2', true ],
+            [ '-3:-2', '-4', false ],
+            [ '-3:-2', '-1', false ]
+        ];
+    }
+
+    public function testClassesDisjoint(): void
+    {
+        $this->assertFalse(
+            (new IntegerRange(1, 2))->intersects(new NonNegativeRange(1, 2))
+        );
+    }
 }

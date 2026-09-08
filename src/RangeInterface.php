@@ -46,4 +46,7 @@ interface RangeInterface
      * Both bounds (if defined) are included in the range.
      */
     public function contains($value): bool;
+
+    /// Whether two ranges have a nonempty intersection
+    public function intersects(self $range): bool;
 }

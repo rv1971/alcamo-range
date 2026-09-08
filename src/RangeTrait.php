@@ -22,7 +22,7 @@ trait RangeTrait
      * - "-x" represents the range ["", "x"].
      * - "x-" represents the range of strings greater or equal to "x".
      */
-    public static function newFromString(string $str)
+    public static function newFromString(string $str): RangeInterface
     {
         return new static(... static::splitString($str));
     }
@@ -79,12 +79,14 @@ trait RangeTrait
         return isset($this->min_) && $this->min_ === $this->max_;
     }
 
-    /// Whether two ranges have a nonempty intersection
-    public function intersects(self $range): bool
+    /** @copydoc alcamo::range::RangeInterface::intersects() */
+    public function intersects(RangeInterface $range): bool
     {
-        return isset($range->min_) && $this->contains($range->min_)
-            || isset($this->min_) && $range->contains($this->min_)
-            || !isset($range->min_) && !isset($this->min_);
+        return get_class($range) == static::class && (
+            isset($range->min_) && $this->contains($range->min_)
+                || isset($this->min_) && $range->contains($this->min_)
+                || !isset($range->min_) && !isset($this->min_)
+        );
     }
 
     /// Return a pair suitable as parameters to __construct()

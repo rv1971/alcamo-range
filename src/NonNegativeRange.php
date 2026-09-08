@@ -15,7 +15,7 @@ use alcamo\exception\{OutOfRange, SyntaxError};
  */
 class NonNegativeRange extends AbstractRange
 {
-    public static function newFromString(string $str)
+    public static function newFromString(string $str): RangeInterface
     {
         $a = static::splitString($str);
 

@@ -115,4 +115,46 @@ class NonNegativeRangeTest extends TestCase
             'both-4'  => [ '20-30', 31, false ]
         ];
     }
+
+    /**
+     * @dataProvider intersectsProvider
+     */
+    public function testIntersects($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            NonNegativeRange::newFromString($range1)
+                ->intersects(NonNegativeRange::newFromString($range2))
+        );
+    }
+
+    public function intersectsProvider(): array
+    {
+        return [
+            [ '', '', true ],
+            [ '', '1-', true ],
+            [ '', '-2', true ],
+            [ '', '1-2', true ],
+            [ '', '42', true ],
+            [ '1-', '-2', true ],
+            [ '1-', '2-', true ],
+            [ '1-', '2-3', true ],
+            [ '1-', '2', true ],
+            [ '1-', '0', false ],
+            [ '2-', '-3', true ],
+            [ '2-', '-1', false ],
+            [ '3-', '1-2', false ],
+            [ '-2', '-1', true ],
+            [ '-2', '0-1', true ],
+            [ '-2', '3-4', false ],
+            [ '-2', '1', true ],
+            [ '-2', '3', false ],
+            [ '1-3', '2-4', true ],
+            [ '1-3', '2', true ],
+            [ '2-3', '0-1', false ],
+            [ '2-3', '2', true ],
+            [ '2-3', '1', false ],
+            [ '2-3', '4', false ]
+        ];
+    }
 }

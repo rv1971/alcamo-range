@@ -15,7 +15,7 @@ class IntegerRange extends AbstractRange
 {
     public const SEPARATOR = ':';
 
-    public static function newFromString(string $str)
+    public static function newFromString(string $str): RangeInterface
     {
         $a = static::splitString($str);
 

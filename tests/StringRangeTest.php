@@ -97,4 +97,46 @@ class StringRangeTest extends TestCase
             'both-5'  => [ 'bar-foo', 'fop', false ]
         ];
     }
+
+    /**
+     * @dataProvider intersectsProvider
+     */
+    public function testIntersects($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            StringRange::newFromString($range1)
+                ->intersects(StringRange::newFromString($range2))
+        );
+    }
+
+    public function intersectsProvider(): array
+    {
+        return [
+            [ '', '', true ],
+            [ '', 'foo-', true ],
+            [ '', '-bar', true ],
+            [ '', 'bar-foo', true ],
+            [ '', 'baz', true ],
+            [ 'bar-', '-foo', true ],
+            [ 'bar-', 'foo-', true ],
+            [ 'bar-', 'foo-quux', true ],
+            [ 'bar-', 'foo', true ],
+            [ 'bar-', 'a', false ],
+            [ 'foo-', '-quux', true ],
+            [ 'foo-', '-bar', false ],
+            [ 'quux-', 'bar-foo', false ],
+            [ '-foo', '-bar', true ],
+            [ '-foo', 'a-bar', true ],
+            [ '-foo', 'quux-qux', false ],
+            [ '-foo', 'bar', true ],
+            [ '-foo', 'quux', false ],
+            [ 'bar-quux', 'foo-qux', true ],
+            [ 'bar-quux', 'foo', true ],
+            [ 'foo-quux', 'a-bar', false ],
+            [ 'foo-quux', 'foo', true ],
+            [ 'foo-quux', 'bar', false ],
+            [ 'foo-quux', 'qux', false ]
+        ];
+    }
 }
