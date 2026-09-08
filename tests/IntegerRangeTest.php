@@ -1,0 +1,109 @@
+<?php
+
+namespace alcamo\range;
+
+use PHPUnit\Framework\TestCase;
+use alcamo\exception\{OutOfRange, SyntaxError};
+
+class IntegerRangeTest extends TestCase
+{
+    /**
+     * @dataProvider newFromStringProvider
+     */
+    public function testNewFromString(
+        $str,
+        $expectedMin,
+        $expectedMax,
+        $expectedString,
+        $expectedIsDefined,
+        $expectedIsBounded,
+        $expectedIsExactValue
+    ): void {
+        $range = IntegerRange::newFromString($str);
+
+        $this->assertEquals(
+            new IntegerRange($expectedMin, $expectedMax),
+            $range
+        );
+
+        $this->assertSame($expectedMin, $range->getMin());
+
+        $this->assertSame($expectedMax, $range->getMax());
+
+        $this->assertSame(
+            [ $expectedMin, $expectedMax ],
+            $range->getMinMax()
+        );
+
+        $this->assertSame($expectedString, (string)$range);
+
+        $this->assertSame($expectedIsDefined, $range->isDefined());
+
+        $this->assertSame($expectedIsBounded, $range->isBounded());
+
+        $this->assertSame($expectedIsExactValue, $range->isExactValue());
+    }
+
+    public function newFromStringProvider(): array
+    {
+        return [
+            'empty' => [ '', null, null, '', false, false, false ],
+            'exact' => [ "  42\r\n", 42, 42, '42', true, true, true ],
+            'left'  => [ '5 :', 5, null, '5:', true, false, false ],
+            'right' => [ '-2  :  99', -2, 99, '-2:99', true, true, false ],
+            'both'  => [ "-12\t:-7", -12, -7, '-12:-7', true, true, false ]
+        ];
+    }
+
+    public function testNewFromStringException(): void
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            'Syntax error in "-12:--8"; not a valid integer range'
+        );
+
+        IntegerRange::newFromString('-12:--8');
+    }
+
+    public function testConstructException2(): void
+    {
+        $this->expectException(OutOfRange::class);
+        $this->expectExceptionMessage(
+            'Value -2 out of range [1, "∞"]'
+        );
+
+        new IntegerRange(1, -2);
+    }
+
+    /**
+     * @dataProvider containsProvider
+     */
+    public function testContains($range, $value, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            IntegerRange::newFromString($range)->contains($value)
+        );
+    }
+
+    public function containsProvider(): array
+    {
+        return [
+            'empty'   => [ '', 1, true ],
+            'exact-1' => [ '77', 76, false ],
+            'exact-2' => [ '77', 77, true ],
+            'exact-3' => [ '77', 78, false ],
+            'left-1'  => [ '5:', 4, false ],
+            'left-2'  => [ '5:', 5, true ],
+            'left-3'  => [ '5:', 6, true ],
+            'right-1' => [ '-3:9', -3, true ],
+            'right-2' => [ '-3:9', 9, true ],
+            'right-3' => [ '-3:9', 10, false ],
+            'right-4' => [ '-3:9', -4, false ],
+            'both-1'  => [ '-30:20', 21, false ],
+            'both-2'  => [ '-30:20', 20, true ],
+            'both-3'  => [ '-30:20', -30, true ],
+            'both-4'  => [ '-30:20', -31, false ]
+        ];
+    }
+}

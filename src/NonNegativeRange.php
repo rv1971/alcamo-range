@@ -15,6 +15,27 @@ use alcamo\exception\{OutOfRange, SyntaxError};
  */
 class NonNegativeRange extends AbstractRange
 {
+    public static function newFromString(string $str)
+    {
+        $a = static::splitString($str);
+
+        if (
+            isset($a[0]) && !ctype_digit($a[0])
+                || isset($a[1]) && !ctype_digit($a[1])
+        ) {
+            /** @throw alcamo::exception::SyntaxError if the range limits are
+             *  not valid decimal integers. */
+            throw (new SyntaxError())->setMessageContext(
+                [
+                    'inData' => $str,
+                    'extraMessage' => 'not a valid nonnegative range'
+                ]
+            );
+        }
+
+        return new static(...$a);
+    }
+
     /**
      * @param $min Minimum (nonnegative integer or `null`).
      *
@@ -64,26 +85,5 @@ class NonNegativeRange extends AbstractRange
 
         return $this->min_ <= $value
             && (!isset($this->max_) || $value <= $this->max_);
-    }
-
-    protected static function splitString(string $str): array
-    {
-        $a = parent::splitString($str);
-
-        if (
-            isset($a[0]) && !ctype_digit($a[0])
-                || isset($a[1]) && !ctype_digit($a[1])
-        ) {
-            /** @throw alcamo::exception::SyntaxError if the range limits are
-             *  not valid decimal integers. */
-            throw (new SyntaxError())->setMessageContext(
-                [
-                    'inData' => $str,
-                    'extraMessage' => 'not a valid nonnegative range'
-                ]
-            );
-        }
-
-        return $a;
     }
 }
