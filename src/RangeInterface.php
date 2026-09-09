@@ -47,14 +47,29 @@ interface RangeInterface
      */
     public function contains($value): bool;
 
-    /// Whether two ranges have a nonempty intersection
+    /**
+     * @brief Whether two ranges have a nonempty intersection
+     *
+     * @return `true` iff both ranges are objects of the same class and they
+     * have a nonempty intersection.
+     */
     public function intersects(self $range): bool;
 
     /**
      * @brief Whether two ranges touch
      *
-     * True iff the two ranges do not intersect but their union is again a
-     * range. This can be true only for discrete value spaces.
+     * @return `true` iff both ranges are objects of the same class and do not
+     * intersect, but their union is again a range. This can be true only for
+     * discrete value spaces.
      */
     public function touches(self $range): bool;
+
+    /**
+     * @brief Compute the union of both ranges, if it is a range
+     *
+     * @return New object of the same class iff both ranges are objects of the
+     * same class and their union is aganin a range, i.e. either intersects()
+     * or touches() is true. Otherwise `null`.
+     */
+    public function createUnionWith(RangeInterface $range): ?RangeInterface;
 }

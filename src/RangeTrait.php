@@ -98,6 +98,51 @@ trait RangeTrait
         );
     }
 
+    /** @copydoc alcamo::range::RangeInterface::createUnion() */
+    public function createUnionWith(RangeInterface $range): ?RangeInterface
+    {
+        if (get_class($range) != static::class) {
+            return null;
+        }
+
+        if (
+            isset($this->min_)
+                && ($range->contains($this->min_)
+                    || $this->min_ === $range->max_ + 1)
+        ) {
+            return new static(
+                $range->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        if (
+            isset($range->min_)
+                && ($this->contains($range->min_)
+                    || $range->min_ === $this->max_ + 1)
+        ) {
+            return new static(
+                $this->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        if (!isset($this->min_) && !isset($range->min_)) {
+            return new static(
+                null,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        return null;
+    }
+
     /// Return a pair suitable as parameters to __construct()
     protected static function splitString(string $str): array
     {

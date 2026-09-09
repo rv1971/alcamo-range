@@ -193,4 +193,71 @@ class IntegerRangeTest extends TestCase
             [ '-5:-3', '-2:7', true ]
         ];
     }
+
+    /**
+     * @dataProvider createUnionProvider
+     */
+    public function testCreateUnion($range1, $range2, $expectedUnion): void
+    {
+        if (!isset($expectedUnion)) {
+            $this->assertNull(
+                IntegerRange::newFromString($range1)
+                    ->createUnionWith(IntegerRange::newFromString($range2))
+            );
+
+            $this->assertNull(
+                IntegerRange::newFromString($range2)
+                    ->createUnionWith(IntegerRange::newFromString($range1))
+            );
+        } else {
+            $this->assertEquals(
+                IntegerRange::newFromString($expectedUnion),
+                IntegerRange::newFromString($range1)
+                    ->createUnionWith(IntegerRange::newFromString($range2))
+            );
+
+            $this->assertEquals(
+                IntegerRange::newFromString($expectedUnion),
+                IntegerRange::newFromString($range2)
+                    ->createUnionWith(IntegerRange::newFromString($range1))
+            );
+        }
+    }
+
+    public function createUnionProvider(): array
+    {
+        return [
+            [ '', '', '' ],
+            [ '', '-1:', '' ],
+            [ '', ':2', '' ],
+            [ '', '-1:2', '' ],
+            [ '', '42', '' ],
+            [ '-1:', ':2', '' ],
+            [ '-1:', '2:', '-1:' ],
+            [ '-1:', '2:3', '-1:' ],
+            [ '-3:', '-1', '-3:' ],
+            [ '-3:', '-4', '-4:' ],
+            [ '2:', ':3', '' ],
+            [ '2:', ':1', '' ],
+            [ '2:', '-3:1', '-3:' ],
+            [ ':2', ':-12', ':2' ],
+            [ ':2', '-2:-1', ':2' ],
+            [ ':2', '3:4', ':4' ],
+            [ ':-3', '-4', ':-3' ],
+            [ ':-3', '-2', ':-2' ],
+            [ '-3:-1', '-2:2', '-3:2' ],
+            [ '-3:-1', '0:2', '-3:2' ],
+            [ '-3:-1', '-2', '-3:-1' ],
+            [ '-3:-2', '-4', '-4:-2' ],
+            [ '-3:-2', '-1', '-3:-1' ],
+            [ '-3:', '-5', null ],
+            [ '3:', ':1', null ],
+            [ '4:', '-3:1', null ],
+            [ ':1', '3:4', null ],
+            [ ':-4', '-2', null ],
+            [ '-3:-1', '1:2', null ],
+            [ '-3:-2', '-5', null ],
+            [ '-4:-3', '-1', null ]
+        ];
+    }
 }
