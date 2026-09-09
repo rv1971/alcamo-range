@@ -79,4 +79,45 @@ class PrefixRangeTest extends TestCase
             [ 'bar-quux', 1, 'b-q' ]
         ];
     }
+
+    public function testClassesDisjoint(): void
+    {
+        $this->assertFalse(
+            (new PrefixRange('a', 'c'))->intersects(new StringRange('b', 'd'))
+        );
+
+        $this->assertFalse(
+            (new PrefixRange('a', 'b'))->touches(new StringRange('c', 'd'))
+        );
+    }
+
+    /**
+     * @dataProvider touchesProvider
+     */
+    public function testTouches($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            PrefixRange::newFromString($range1)
+                ->touches(PrefixRange::newFromString($range2))
+        );
+
+        $this->assertSame(
+            $expectedResult,
+            PrefixRange::newFromString($range2)
+                ->touches(PrefixRange::newFromString($range1))
+        );
+    }
+
+    public function touchesProvider(): array
+    {
+        return [
+            [ '', '', false ],
+            [ '', 'bar-foo', false ],
+            [ '-bar', 'foo-', false ],
+            [ '-foo', 'fop-', true ],
+            [ '-foo', 'fooo-', false ],
+            [ 'bar-bazx', 'bazy-qux', true ]
+        ];
+    }
 }

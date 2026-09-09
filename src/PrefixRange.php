@@ -51,6 +51,42 @@ class PrefixRange extends StringRange
         );
     }
 
+    public function touches(RangeInterface $range): bool
+    {
+        if (get_class($range) != static::class) {
+            return false;
+        }
+
+        /* The strlen() condition ensures that 'zzz' is *not* considered to
+         * touch 'aaaa'. */
+
+        if (isset($this->max_)) {
+            $thisMaxPlus = $this->max_;
+            $thisMaxPlus++;
+
+            if (
+                $range->min_ === $thisMaxPlus
+                    && strlen($thisMaxPlus) == strlen($this->max_)
+            ) {
+                return true;
+            }
+        }
+
+        if (isset($range->max_)) {
+            $rangeMaxPlus = $range->max_;
+            $rangeMaxPlus++;
+
+            if (
+                $this->min_ === $rangeMaxPlus
+                    && strlen($rangeMaxPlus) == strlen($range->max_)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// Return new object with borders cropped to given maxLength
     public function crop(int $maxLength): self
     {

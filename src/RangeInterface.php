@@ -49,4 +49,12 @@ interface RangeInterface
 
     /// Whether two ranges have a nonempty intersection
     public function intersects(self $range): bool;
+
+    /**
+     * @brief Whether two ranges touch
+     *
+     * True iff the two ranges do not intersect but their union is again a
+     * range. This can be true only for discrete value spaces.
+     */
+    public function touches(self $range): bool;
 }

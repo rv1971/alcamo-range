@@ -126,6 +126,12 @@ class NonNegativeRangeTest extends TestCase
             NonNegativeRange::newFromString($range1)
                 ->intersects(NonNegativeRange::newFromString($range2))
         );
+
+        $this->assertSame(
+            $expectedResult,
+            NonNegativeRange::newFromString($range2)
+                ->intersects(NonNegativeRange::newFromString($range1))
+        );
     }
 
     public function intersectsProvider(): array
@@ -155,6 +161,35 @@ class NonNegativeRangeTest extends TestCase
             [ '2-3', '2', true ],
             [ '2-3', '1', false ],
             [ '2-3', '4', false ]
+        ];
+    }
+
+    /**
+     * @dataProvider touchesProvider
+     */
+    public function testTouches($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            NonNegativeRange::newFromString($range1)
+                ->touches(NonNegativeRange::newFromString($range2))
+        );
+
+        $this->assertSame(
+            $expectedResult,
+            NonNegativeRange::newFromString($range2)
+                ->touches(NonNegativeRange::newFromString($range1))
+        );
+    }
+
+    public function touchesProvider(): array
+    {
+        return [
+            [ '', '', false ],
+            [ '', '1-2', false ],
+            [ '-2', '2-', false ],
+            [ '-2', '3-', true ],
+            [ '1-3', '4-7', true ]
         ];
     }
 }

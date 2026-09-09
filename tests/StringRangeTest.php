@@ -108,6 +108,12 @@ class StringRangeTest extends TestCase
             StringRange::newFromString($range1)
                 ->intersects(StringRange::newFromString($range2))
         );
+
+        $this->assertSame(
+            $expectedResult,
+            StringRange::newFromString($range2)
+                ->intersects(StringRange::newFromString($range1))
+        );
     }
 
     public function intersectsProvider(): array
@@ -138,5 +144,13 @@ class StringRangeTest extends TestCase
             [ 'foo-quux', 'bar', false ],
             [ 'foo-quux', 'qux', false ]
         ];
+    }
+
+    public function testTouches(): void
+    {
+        $this->assertFalse(
+            StringRange::newFromString('bar-foo')
+                ->touches(StringRange::newFromString('fop-qux'))
+        );
     }
 }

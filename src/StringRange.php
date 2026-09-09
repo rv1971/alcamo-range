@@ -49,4 +49,9 @@ class StringRange extends AbstractRange
         return $this->min_ <= $value
             && (!isset($this->max_) || $value <= $this->max_);
     }
+
+    public function touches(RangeInterface $range): bool
+    {
+        return false;
+    }
 }

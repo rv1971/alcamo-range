@@ -89,6 +89,15 @@ trait RangeTrait
         );
     }
 
+    /** @copydoc alcamo::range::RangeInterface::touches() */
+    public function touches(RangeInterface $range): bool
+    {
+        return get_class($range) == static::class && (
+            isset($range->max_) && $this->min_ === $range->max_ + 1
+                || isset($this->max_) && $range->min_ === $this->max_ + 1
+        );
+    }
+
     /// Return a pair suitable as parameters to __construct()
     protected static function splitString(string $str): array
     {
