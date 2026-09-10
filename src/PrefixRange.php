@@ -2,6 +2,15 @@
 
 namespace alcamo\range;
 
+/**
+ * @brief Range of prefix strings
+ *
+ * @invariant Immutable class.
+ *
+ * @invariant getMin() always returns a string, which may be empty.
+ *
+ * @date Last reviewed 2026-09-10
+ */
 class PrefixRange extends StringRange
 {
     private $commonPrefix_; ///< Longest common prefix

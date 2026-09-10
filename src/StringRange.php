@@ -32,7 +32,7 @@ class StringRange extends AbstractRange
     }
 
     /**
-     * @copydoc alcamo::range::RangeInterface::isBounded()
+     * @copydoc alcamo::range::RangeInterface::isDefined()
      *
      * An empty string as a lower bound is not taken into account since this
      * is implied by the underlying data type.
