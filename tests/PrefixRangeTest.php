@@ -59,27 +59,6 @@ class PrefixRangeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cropProvider
-     */
-    public function testCrop($range, $maxLength, $expectedRange): void
-    {
-        $this->assertEquals(
-            PrefixRange::newFromString($expectedRange),
-            PrefixRange::newFromString($range)->crop($maxLength)
-        );
-    }
-
-    public function cropProvider(): array
-    {
-        return [
-            [ '', 7, '' ],
-            [ 'bar-quux', 4, 'bar-quux' ],
-            [ 'bar-quux', 3, 'bar-quu' ],
-            [ 'bar-quux', 1, 'b-q' ]
-        ];
-    }
-
     public function testClassesDisjoint(): void
     {
         $this->assertFalse(
@@ -88,6 +67,11 @@ class PrefixRangeTest extends TestCase
 
         $this->assertFalse(
             (new PrefixRange('a', 'b'))->touches(new StringRange('c', 'd'))
+        );
+
+        $this->assertNull(
+            (new PrefixRange('a', 'b'))
+                ->createUnionWith(new StringRange('a', 'b'))
         );
     }
 
@@ -118,6 +102,91 @@ class PrefixRangeTest extends TestCase
             [ '-foo', 'fop-', true ],
             [ '-foo', 'fooo-', false ],
             [ 'bar-bazx', 'bazy-qux', true ]
+        ];
+    }
+
+    /**
+     * @dataProvider createUnionProvider
+     */
+    public function testCreateUnion($range1, $range2, $expectedUnion): void
+    {
+        if (!isset($expectedUnion)) {
+            $this->assertNull(
+                PrefixRange::newFromString($range1)
+                    ->createUnionWith(PrefixRange::newFromString($range2))
+            );
+
+            $this->assertNull(
+                PrefixRange::newFromString($range2)
+                    ->createUnionWith(PrefixRange::newFromString($range1))
+            );
+        } else {
+            $this->assertEquals(
+                PrefixRange::newFromString($expectedUnion),
+                PrefixRange::newFromString($range1)
+                    ->createUnionWith(PrefixRange::newFromString($range2))
+            );
+
+            $this->assertEquals(
+                PrefixRange::newFromString($expectedUnion),
+                PrefixRange::newFromString($range2)
+                    ->createUnionWith(PrefixRange::newFromString($range1))
+            );
+        }
+    }
+
+    public function createUnionProvider(): array
+    {
+        return [
+            [ '', '', '' ],
+            [ '', 'foo-', '' ],
+            [ '', '-bar', '' ],
+            [ '', 'bar-foo', '' ],
+            [ '', 'baz', '' ],
+            [ 'bar-', '-foo', '' ],
+            [ 'bar-', 'foo-', 'bar-' ],
+            [ 'bar-', 'foo-quux', 'bar-' ],
+            [ 'bar-', 'foo', 'bar-' ],
+            [ 'bar-', 'a', null ],
+            [ 'foo-', '-quux', '' ],
+            [ 'foo-', '-bar', null ],
+            [ 'quux-', 'bar-foo', null ],
+            [ '-foo', '-bar', '-foo' ],
+            [ '-foo', 'a-bar', '-foo' ],
+            [ '-foo', 'quux-qux', null ],
+            [ '-foo', 'bar', '-foo' ],
+            [ '-foo', 'quux', null ],
+            [ 'bar-quux', 'foo-qux', 'bar-qux' ],
+            [ 'bar-quux', 'foo', 'bar-quux' ],
+            [ 'foo-quux', 'a-bar', null ],
+            [ 'foo-quux', 'foo', 'foo-quux' ],
+            [ 'foo-quux', 'bar', null ],
+            [ 'foo-quux', 'qux', null ],
+            [ 'foo-quux', 'quuy-quxyz', 'foo-quxyz' ],
+            [ '-foo', 'fop-', '' ],
+            [ '-foo', 'fopa-', null ],
+            [ 'bar-bazx', 'bazy-qux', 'bar-qux' ]
+        ];
+    }
+
+    /**
+     * @dataProvider cropProvider
+     */
+    public function testCrop($range, $maxLength, $expectedRange): void
+    {
+        $this->assertEquals(
+            PrefixRange::newFromString($expectedRange),
+            PrefixRange::newFromString($range)->crop($maxLength)
+        );
+    }
+
+    public function cropProvider(): array
+    {
+        return [
+            [ '', 7, '' ],
+            [ 'bar-quux', 4, 'bar-quux' ],
+            [ 'bar-quux', 3, 'bar-quu' ],
+            [ 'bar-quux', 1, 'b-q' ]
         ];
     }
 }

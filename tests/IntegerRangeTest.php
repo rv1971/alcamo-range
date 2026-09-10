@@ -163,6 +163,11 @@ class IntegerRangeTest extends TestCase
         $this->assertFalse(
             (new IntegerRange(1, 2))->touches(new NonNegativeRange(3, 4))
         );
+
+        $this->assertNull(
+            (new IntegerRange(1, 2))
+                ->createUnionWith(new NonNegativeRange(1, 2))
+        );
     }
 
     /**

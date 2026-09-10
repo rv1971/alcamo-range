@@ -87,6 +87,57 @@ class PrefixRange extends StringRange
         return false;
     }
 
+    /** @copydoc alcamo::range::RangeInterface::createUnion() */
+    public function createUnionWith(RangeInterface $range): ?RangeInterface
+    {
+        if (get_class($range) != static::class) {
+            return null;
+        }
+
+        $rangeMaxPlus = $range->max_;
+        $rangeMaxPlus++;
+
+        if (
+            isset($this->min_)
+                && ($range->contains($this->min_)
+                    || $this->min_ === $rangeMaxPlus)
+        ) {
+            return new static(
+                $range->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        $thisMaxPlus = $this->max_;
+        $thisMaxPlus++;
+
+        if (
+            isset($range->min_)
+                && ($this->contains($range->min_)
+                    || $range->min_ === $thisMaxPlus)
+        ) {
+            return new static(
+                $this->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        if (!isset($this->min_) && !isset($range->min_)) {
+            return new static(
+                null,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        return null;
+    }
+
     /// Return new object with borders cropped to given maxLength
     public function crop(int $maxLength): self
     {

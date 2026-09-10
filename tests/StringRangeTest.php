@@ -153,4 +153,65 @@ class StringRangeTest extends TestCase
                 ->touches(StringRange::newFromString('fop-qux'))
         );
     }
+
+    /**
+     * @dataProvider createUnionProvider
+     */
+    public function testCreateUnion($range1, $range2, $expectedUnion): void
+    {
+        if (!isset($expectedUnion)) {
+            $this->assertNull(
+                StringRange::newFromString($range1)
+                    ->createUnionWith(StringRange::newFromString($range2))
+            );
+
+            $this->assertNull(
+                StringRange::newFromString($range2)
+                    ->createUnionWith(StringRange::newFromString($range1))
+            );
+        } else {
+            $this->assertEquals(
+                StringRange::newFromString($expectedUnion),
+                StringRange::newFromString($range1)
+                    ->createUnionWith(StringRange::newFromString($range2))
+            );
+
+            $this->assertEquals(
+                StringRange::newFromString($expectedUnion),
+                StringRange::newFromString($range2)
+                    ->createUnionWith(StringRange::newFromString($range1))
+            );
+        }
+    }
+
+    public function createUnionProvider(): array
+    {
+        return [
+            [ '', '', '' ],
+            [ '', 'foo-', '' ],
+            [ '', '-bar', '' ],
+            [ '', 'bar-foo', '' ],
+            [ '', 'baz', '' ],
+            [ 'bar-', '-foo', '' ],
+            [ 'bar-', 'foo-', 'bar-' ],
+            [ 'bar-', 'foo-quux', 'bar-' ],
+            [ 'bar-', 'foo', 'bar-' ],
+            [ 'bar-', 'a', null ],
+            [ 'foo-', '-quux', '' ],
+            [ 'foo-', '-bar', null ],
+            [ 'quux-', 'bar-foo', null ],
+            [ '-foo', '-bar', '-foo' ],
+            [ '-foo', 'a-bar', '-foo' ],
+            [ '-foo', 'quux-qux', null ],
+            [ '-foo', 'bar', '-foo' ],
+            [ '-foo', 'quux', null ],
+            [ 'bar-quux', 'foo-qux', 'bar-qux' ],
+            [ 'bar-quux', 'foo', 'bar-quux' ],
+            [ 'foo-quux', 'a-bar', null ],
+            [ 'foo-quux', 'foo', 'foo-quux' ],
+            [ 'foo-quux', 'bar', null ],
+            [ 'foo-quux', 'qux', null ],
+            [ 'foo-quux', 'quuy-qux', null ]
+        ];
+    }
 }

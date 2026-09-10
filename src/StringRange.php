@@ -54,4 +54,40 @@ class StringRange extends AbstractRange
     {
         return false;
     }
+
+    public function createUnionWith(RangeInterface $range): ?RangeInterface
+    {
+        if (get_class($range) != static::class) {
+            return null;
+        }
+
+        if (isset($this->min_) && $range->contains($this->min_)) {
+            return new static(
+                $range->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        if (isset($range->min_) && $this->contains($range->min_)) {
+            return new static(
+                $this->min_,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        if (!isset($this->min_) && !isset($range->min_)) {
+            return new static(
+                null,
+                isset($this->max_) && isset($range->max_)
+                    ? max($this->max_, $range->max_)
+                    : null
+            );
+        }
+
+        return null;
+    }
 }
