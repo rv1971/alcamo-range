@@ -9,6 +9,13 @@ namespace alcamo\range;
  *
  * @invariant getMin() always returns a string, which may be empty.
  *
+ * @warning The notion of touching underlying touches() and createUnionWith()
+ * relies on PHP's ++ operator for strings. It works correctly within the
+ * space of numeric prefixes and within the space of alphabetic prefixes, in
+ * the sense that, for instance, '02' comes after '01' and 'abd' comes after
+ * 'abc' (preserving case, i.e. 'xzA' comes after 'xyZ'). But there is nothing
+ * that comes after '999' or after 'zz'.
+ *
  * @date Last reviewed 2026-09-10
  */
 class PrefixRange extends StringRange
@@ -66,34 +73,12 @@ class PrefixRange extends StringRange
             return false;
         }
 
-        /* The strlen() condition ensures that 'zzz' is *not* considered to
-         * touch 'aaaa'. */
-
-        if (isset($this->max_)) {
-            $thisMaxPlus = $this->max_;
-            $thisMaxPlus++;
-
-            if (
-                $range->min_ === $thisMaxPlus
-                    && strlen($thisMaxPlus) == strlen($this->max_)
-            ) {
-                return true;
-            }
-        }
-
-        if (isset($range->max_)) {
-            $rangeMaxPlus = $range->max_;
-            $rangeMaxPlus++;
-
-            if (
-                $this->min_ === $rangeMaxPlus
-                    && strlen($rangeMaxPlus) == strlen($range->max_)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->touches2(
+            $this->min_,
+            $this->max_,
+            $range->min_,
+            $range->max_
+        );
     }
 
     /** @copydoc alcamo::range::RangeInterface::createUnion() */
@@ -103,48 +88,12 @@ class PrefixRange extends StringRange
             return null;
         }
 
-        $rangeMaxPlus = $range->max_;
-        $rangeMaxPlus++;
-
-        if (
-            isset($this->min_)
-                && ($range->contains($this->min_)
-                    || $this->min_ === $rangeMaxPlus)
-        ) {
-            return new static(
-                $range->min_,
-                isset($this->max_) && isset($range->max_)
-                    ? max($this->max_, $range->max_)
-                    : null
-            );
-        }
-
-        $thisMaxPlus = $this->max_;
-        $thisMaxPlus++;
-
-        if (
-            isset($range->min_)
-                && ($this->contains($range->min_)
-                    || $range->min_ === $thisMaxPlus)
-        ) {
-            return new static(
-                $this->min_,
-                isset($this->max_) && isset($range->max_)
-                    ? max($this->max_, $range->max_)
-                    : null
-            );
-        }
-
-        if (!isset($this->min_) && !isset($range->min_)) {
-            return new static(
-                null,
-                isset($this->max_) && isset($range->max_)
-                    ? max($this->max_, $range->max_)
-                    : null
-            );
-        }
-
-        return null;
+        return $this->createUnionWith2(
+            $this->min_,
+            $this->max_,
+            $range->min_,
+            $range->max_
+        );
     }
 
     /// Return new object with borders cropped to given maxLength
@@ -154,5 +103,91 @@ class PrefixRange extends StringRange
             substr($this->min_, 0, $maxLength),
             substr($this->max_, 0, $maxLength)
         );
+    }
+
+    protected function inc(?string $value)
+    {
+        switch (true) {
+            case $value == '':
+                return null;
+
+            case trim($value, '9') == '':
+                return ++$value;
+
+            case ctype_digit($value):
+                $value = "x$value";
+                $value++;
+                return substr($value, 1);
+
+            default:
+                return ++$value;
+        }
+    }
+
+    protected function touches2(
+        ?string $min1,
+        ?string $max1,
+        ?string $min2,
+        ?string $max2
+    ): bool {
+        if (isset($max1)) {
+            $max1Plus = $this->inc($max1);
+
+            if ($min2 === $max1Plus && strlen($max1Plus) == strlen($max1)) {
+                return true;
+            }
+        }
+
+        if (isset($max2)) {
+            $max2Plus = $this->inc($max2);
+
+            if ($min1 === $max2Plus && strlen($max2Plus) == strlen($max2)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function createUnionWith2(
+        ?string $min1,
+        ?string $max1,
+        ?string $min2,
+        ?string $max2
+    ): ?RangeInterface {
+        $max2Plus = $this->inc($max2);
+
+        if (
+            $min1 != ''
+                && $min2 <= $min1
+                && (!isset($max2) || $min1 <= $max2 || $min1 === $max2Plus)
+        ) {
+            return new static(
+                $min2,
+                isset($max1) && isset($max2) ? max($max1, $max2) : null
+            );
+        }
+
+        $max1Plus = $this->inc($max1);
+
+        if (
+            $min2 != ''
+                && $min1 <= $min2
+                && (!isset($max1) || $min2 <= $max1 || $min2 === $max1Plus)
+        ) {
+            return new static(
+                $min1,
+                isset($max1) && isset($max2) ? max($max1, $max2) : null
+            );
+        }
+
+        if ($min1 == '' && $min2 == '') {
+            return new static(
+                '',
+                isset($max1) && isset($max2) ? max($max1, $max2) : null
+            );
+        }
+
+        return null;
     }
 }

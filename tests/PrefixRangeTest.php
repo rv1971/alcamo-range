@@ -101,14 +101,16 @@ class PrefixRangeTest extends TestCase
             [ '-bar', 'foo-', false ],
             [ '-foo', 'fop-', true ],
             [ '-foo', 'fooo-', false ],
-            [ 'bar-bazx', 'bazy-qux', true ]
+            [ 'bar-bazx', 'bazy-qux', true ],
+            [ '00', '01-03', true ],
+            [ '-011', '012-', true ]
         ];
     }
 
     /**
-     * @dataProvider createUnionProvider
+     * @dataProvider createUnionWithProvider
      */
-    public function testCreateUnion($range1, $range2, $expectedUnion): void
+    public function testCreateUnionWith($range1, $range2, $expectedUnion): void
     {
         if (!isset($expectedUnion)) {
             $this->assertNull(
@@ -135,7 +137,7 @@ class PrefixRangeTest extends TestCase
         }
     }
 
-    public function createUnionProvider(): array
+    public function createUnionWithProvider(): array
     {
         return [
             [ '', '', '' ],

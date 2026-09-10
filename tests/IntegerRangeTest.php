@@ -200,9 +200,9 @@ class IntegerRangeTest extends TestCase
     }
 
     /**
-     * @dataProvider createUnionProvider
+     * @dataProvider createUnionWithProvider
      */
-    public function testCreateUnion($range1, $range2, $expectedUnion): void
+    public function testCreateUnionWith($range1, $range2, $expectedUnion): void
     {
         if (!isset($expectedUnion)) {
             $this->assertNull(
@@ -229,7 +229,7 @@ class IntegerRangeTest extends TestCase
         }
     }
 
-    public function createUnionProvider(): array
+    public function createUnionWithProvider(): array
     {
         return [
             [ '', '', '' ],
