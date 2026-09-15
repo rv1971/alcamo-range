@@ -132,4 +132,14 @@ class NumericPrefixRange extends PrefixRange
             );
         }
     }
+
+    /// Return matching prefix, or null if no match.
+    public function getMatch(string $text): ?string
+    {
+        $prefix = substr($text, 0, strlen($this->min_));
+
+        return ($this->min_ <= $prefix && $prefix <= $this->max_)
+            ? $prefix
+            : null;
+    }
 }

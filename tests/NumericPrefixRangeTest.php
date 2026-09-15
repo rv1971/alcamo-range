@@ -148,4 +148,27 @@ class NumericPrefixRangeTest extends TestCase
             [ '-765499', '7655-', '' ]
         ];
     }
+
+    /**
+     * @dataProvider getMatchProvider
+     */
+    public function testGetMatch($range, $text, $expectedMatch): void
+    {
+        $this->assertSame(
+            $expectedMatch,
+            NumericPrefixRange::newFromString($range)->getMatch($text)
+        );
+    }
+
+    public function getMatchProvider(): array
+    {
+        return [
+            [ '', '1234', '1' ],
+            [ '', 'foo', null ],
+            [ '1-23', '24', null ],
+            [ '1-23', '2141', '21' ],
+            [ '421-', '987654', '987' ],
+            [ '420-', '41999', null ]
+        ];
+    }
 }

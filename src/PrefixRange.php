@@ -81,7 +81,6 @@ class PrefixRange extends StringRange
         );
     }
 
-    /** @copydoc alcamo::range::RangeInterface::createUnion() */
     public function createUnionWith(RangeInterface $range): ?RangeInterface
     {
         if (get_class($range) != static::class) {
@@ -104,6 +103,7 @@ class PrefixRange extends StringRange
             substr($this->max_, 0, $maxLength)
         );
     }
+
 
     protected function inc(?string $value)
     {
