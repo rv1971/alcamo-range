@@ -54,4 +54,98 @@ class NumericPrefixRangeTest extends TestCase
 
         new NumericPrefixRange('0a', '99');
     }
+
+    /**
+     * @dataProvider touchesProvider
+     */
+    public function testTouches($range1, $range2, $expectedResult): void
+    {
+        $this->assertSame(
+            $expectedResult,
+            NumericPrefixRange::newFromString($range1)
+                ->touches(NumericPrefixRange::newFromString($range2))
+        );
+
+        $this->assertSame(
+            $expectedResult,
+            NumericPrefixRange::newFromString($range2)
+                ->touches(NumericPrefixRange::newFromString($range1))
+        );
+    }
+
+    public function touchesProvider(): array
+    {
+        return [
+            [ '', '', false ],
+            [ '', '1-2', false ],
+            [ '-123', '125-', false ],
+            [ '-123', '124-', true ],
+            [ '2-299', '3-411', true ],
+            [ '5999', '6-7', true ],
+            [ '-123', '1231-', false ]
+        ];
+    }
+
+    /**
+     * @dataProvider createUnionWithProvider
+     */
+    public function testCreateUnionWith($range1, $range2, $expectedUnion): void
+    {
+        if (!isset($expectedUnion)) {
+            $this->assertNull(
+                NumericPrefixRange::newFromString($range1)
+                    ->createUnionWith(
+                        NumericPrefixRange::newFromString($range2)
+                    )
+            );
+
+            $this->assertNull(
+                NumericPrefixRange::newFromString($range2)
+                    ->createUnionWith(
+                        NumericPrefixRange::newFromString($range1)
+                    )
+            );
+        } else {
+            $this->assertEquals(
+                NumericPrefixRange::newFromString($expectedUnion),
+                NumericPrefixRange::newFromString($range1)
+                    ->createUnionWith(
+                        NumericPrefixRange::newFromString($range2)
+                    )
+            );
+
+            $this->assertEquals(
+                NumericPrefixRange::newFromString($expectedUnion),
+                NumericPrefixRange::newFromString($range2)
+                    ->createUnionWith(
+                        NumericPrefixRange::newFromString($range1)
+                    )
+            );
+        }
+    }
+
+    public function createUnionWithProvider(): array
+    {
+        return [
+            [ '', '', '' ],
+            [ '', '1-', '' ],
+            [ '', '-4567', '' ],
+            [ '', '12-345', '' ],
+            [ '', '98765', '' ],
+            [ '123-', '-456', '' ],
+            [ '123-', '456-', '123-' ],
+            [ '123-', '456-7899', '123-' ],
+            [ '123-', '456', '123-' ],
+            [ '34-', '2', null ],
+            [ '34-', '339', '339-' ],
+            [ '5678-', '-568', '' ],
+            [ '2345-', '-1', null ],
+            [ '2345-', '-2344', '' ],
+            [ '7-', '1234-5', null ],
+            [ '6-', '1234-5', '1234-' ],
+            [ '123-4567', '34-5', '123-5' ],
+            [ '123-4567', '45', '123-45' ],
+            [ '-765499', '7655-', '' ]
+        ];
+    }
 }

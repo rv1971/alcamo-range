@@ -66,4 +66,70 @@ class NumericPrefixRange extends PrefixRange
 
         parent::__construct($min, $max);
     }
+
+    public function touches(RangeInterface $range): bool
+    {
+        if (get_class($range) != static::class) {
+            return false;
+        }
+
+        $len1 = strlen($this->min_);
+        $len2 = strlen($range->min_);
+
+        if($len1 < $len2) {
+            return $this->touches2(
+                str_pad($this->min_, $len2, '0'),
+                str_pad($this->max_, $len2, '9'),
+                $range->min_,
+                $range->max_
+            );
+        } elseif($len1 > $len2) {
+            return $this->touches2(
+                $this->min_,
+                $this->max_,
+                str_pad($range->min_, $len1, '0'),
+                str_pad($range->max_, $len1, '9')
+            );
+        } else {
+            return $this->touches2(
+                $this->min_,
+                $this->max_,
+                $range->min_,
+                $range->max_
+            );
+        }
+    }
+
+    public function createUnionWith(RangeInterface $range): ?RangeInterface
+    {
+        if (get_class($range) != static::class) {
+            return null;
+        }
+
+        $len1 = strlen($this->min_);
+        $len2 = strlen($range->min_);
+
+        if($len1 < $len2) {
+            return $this->createUnionWith2(
+                str_pad($this->min_, $len2, '0'),
+                str_pad($this->max_, $len2, '9'),
+                $range->min_,
+                $range->max_
+            );
+        } elseif($len1 > $len2) {
+            return $this->createUnionWith2(
+                $this->min_,
+                $this->max_,
+                str_pad($range->min_, $len1, '0'),
+                str_pad($range->max_, $len1, '9')
+            );
+        } else {
+            return $this->createUnionWith2(
+                $this->min_,
+                $this->max_,
+                $range->min_,
+                $range->max_
+            );
+        }
+    }
 }
