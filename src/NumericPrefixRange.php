@@ -142,4 +142,90 @@ class NumericPrefixRange extends PrefixRange
             ? $prefix
             : null;
     }
+
+    /// Create a minimal representation as a list of prefixes
+    public function toArray(): array
+    {
+        if ($this->isExactValue()) {
+            return [ $this->min_ ];
+        }
+
+        $result = [];
+
+        /*
+         * For the following documentation, the bounds are subdivided as
+         * follows:
+         * - min = common-prefix major-min-digit other-min-digits
+         * - max = common-prefix major-max-digit other-max-digits
+         */
+
+        $min = $this->min_;
+        $max = $this->max_;
+
+        $commonPrefixLength = strlen($this->getCommonPrefix());
+
+        /* If other-min-digits are not made of zeros, create values in [min,
+         * common-prefix major-min-digit[. Start at position of last non-zero
+         * digit in $min */
+        $pos = strlen(rtrim($min, '0')) - 1;
+
+        if ($pos >= 0) {
+            for (; $pos > $commonPrefixLength; $pos--) {
+                $prefix = substr($min, 0, $pos);
+
+                if ($min[$pos] != 'A') {
+                    for ($j = $min[$pos]; $j <= 9; $j++) {
+                        $result[] = "$prefix$j";
+                    }
+                }
+
+                $min[$pos - 1] = $min[$pos - 1] < 9 ? $min[$pos - 1] + 1 : 'A';
+            }
+        } else {
+            $pos = $commonPrefixLength;
+        }
+
+        $prefix = $this->getCommonPrefix();
+
+        /* position of last non-9 digit in $max */
+        $lastMaxDigitPos = strlen(rtrim($max, '9')) - 1;
+
+        if ($lastMaxDigitPos <= $commonPrefixLength) {
+            /* Special case other-max-digits consists in
+             * '9's: create values in [common-prefix major-min-digit,
+             * common-prefix major-max-digit] */
+            for ($j = $min[$pos]; $j <= $max[$pos]; $j++) {
+                $result[] = "$prefix$j";
+            }
+        } else {
+            /* Create values in [common-prefix major-min-digit,
+             * common-prefix major-max-digit[. */
+            for ($j = $min[$pos]; $j < $max[$pos]; $j++) {
+                $result[] = "$prefix$j";
+            }
+
+            /* Create values in [common-prefix major-max-digit,
+             * common-prefix major-max-digit other-max-digits[. */
+            for ($pos++; $pos < $lastMaxDigitPos; $pos++) {
+                $prefix = substr($max, 0, $pos);
+
+                for ($j = 0; $j < $max[$pos]; $j++) {
+                    $result[] = "$prefix$j";
+                }
+            }
+
+            if ($pos < strlen($max)) {
+                /* Create values in [common-prefix major-max-digit
+                 * other-max-digits, common-prefix major-max-digit
+                 * other-max-digits]. */
+                $prefix = substr($max, 0, $pos);
+
+                for ($j = 0; $j <= $max[$pos]; $j++) {
+                    $result[] = "$prefix$j";
+                }
+            }
+        }
+
+        return $result;
+    }
 }
