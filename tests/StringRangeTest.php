@@ -67,6 +67,47 @@ class StringRangeTest extends TestCase
     }
 
     /**
+     * @dataProvider compareProvider
+     */
+    public function testCompare(
+        $rangeString1,
+        $rangeString2,
+        $expectedResult
+    ): void {
+        $range1 = StringRange::newFromString($rangeString1);
+        $range2 = StringRange::newFromString($rangeString2);
+
+        $this->assertSame(
+            $expectedResult,
+            StringRange::compare($range1, $range2)
+        );
+
+        $this->assertSame(
+            -$expectedResult,
+            StringRange::compare($range2, $range1)
+        );
+
+        $this->assertSame(0, StringRange::compare($range1, $range1));
+
+        $this->assertSame(0, StringRange::compare($range2, $range2));
+    }
+
+    public function compareProvider(): array
+    {
+        return [
+            [ '-foo', '-', -1 ],
+            [ '-', 'bar-', -1 ],
+            [ '-', 'bar-foo', -1 ],
+            [ '-foo', 'bar-foo', -1 ],
+            [ '-foo', 'bar-', -1 ],
+            [ '-foo', 'bar-foo', -1 ],
+            [ '-foox', 'bar-foo', -1 ],
+            [ 'bar-foo', 'baz-foo', -1 ],
+            [ 'bar-foo', 'bar-foox', -1 ]
+        ];
+    }
+
+    /**
      * @dataProvider containsProvider
      */
     public function testContains($range, $value, $expectedResult): void

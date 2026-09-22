@@ -15,6 +15,9 @@ namespace alcamo\range;
  */
 interface RangeInterface
 {
+    /// Function to be used in usort()
+    public static function compare($range1, $range2);
+
     public function __toString(): string;
 
     /// Get lower bound

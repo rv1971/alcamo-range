@@ -76,6 +76,47 @@ class IntegerRangeTest extends TestCase
     }
 
     /**
+     * @dataProvider compareProvider
+     */
+    public function testCompare(
+        $rangeString1,
+        $rangeString2,
+        $expectedResult
+    ): void {
+        $range1 = IntegerRange::newFromString($rangeString1);
+        $range2 = IntegerRange::newFromString($rangeString2);
+
+        $this->assertSame(
+            $expectedResult,
+            IntegerRange::compare($range1, $range2)
+        );
+
+        $this->assertSame(
+            -$expectedResult,
+            IntegerRange::compare($range2, $range1)
+        );
+
+        $this->assertSame(0, IntegerRange::compare($range1, $range1));
+
+        $this->assertSame(0, IntegerRange::compare($range2, $range2));
+    }
+
+    public function compareProvider(): array
+    {
+        return [
+            [ ':-1', ':', -1 ],
+            [ ':', '-5:', -1 ],
+            [ ':', '1:2', -1 ],
+            [ ':2', '1:2', -1 ],
+            [ ':2', '1:', -1 ],
+            [ ':2', '1:2', -1 ],
+            [ ':7', '1:2', -1 ],
+            [ '-2:2', '0:2', -1 ],
+            [ '1:2', '1:3', -1 ]
+        ];
+    }
+
+    /**
      * @dataProvider containsProvider
      */
     public function testContains($range, $value, $expectedResult): void

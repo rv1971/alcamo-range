@@ -9,7 +9,49 @@ namespace alcamo\range;
  */
 trait RangeTrait
 {
-    protected $min_; ///< Minimum value or `null`
+    /** @copydoc alcamo::range::RangeInterface::compare() */
+    public static function compare($range1, $range2)
+    {
+        $min1 = $range1->getMin();
+        $min2 = $range2->getMin();
+
+        switch (true) {
+            case !isset($min1) && isset($min2):
+                return -1;
+
+            case isset($min1) && !isset($min2):
+                return 1;
+
+            case $min1 < $min2:
+                return -1;
+
+            case $min1 > $min2:
+                return 1;
+
+            default:
+                $max1 = $range1->getMax();
+                $max2 = $range2->getMax();
+
+                switch (true) {
+                    case isset($max1) && !isset($max2):
+                        return -1;
+
+                    case !isset($max1) && isset($max2):
+                        return 1;
+
+                    case $max1 < $max2:
+                        return -1;
+
+                    case $max1 > $max2:
+                        return 1;
+
+                    default:
+                        return 0;
+                }
+        }
+    }
+
+    protected $min_; ///< Maximum value or `null`
     protected $max_; ///< Maximum value or `null`
 
     /**
