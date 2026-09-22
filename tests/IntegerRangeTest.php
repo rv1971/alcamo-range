@@ -47,7 +47,7 @@ class IntegerRangeTest extends TestCase
     public function newFromStringProvider(): array
     {
         return [
-            'empty' => [ '', null, null, '', false, false, false ],
+            'empty' => [ '', null, null, ':', false, false, false ],
             'exact' => [ "  42\r\n", 42, 42, '42', true, true, true ],
             'left'  => [ '5 :', 5, null, '5:', true, false, false ],
             'right' => [ '-2  :  99', -2, 99, '-2:99', true, true, false ],

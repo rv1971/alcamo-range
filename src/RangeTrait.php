@@ -71,9 +71,9 @@ trait RangeTrait
 
     public function __toString(): string
     {
-        /** Return empty string if undefined. */
+        /** Return separator alone if undefined. */
         if (!$this->isDefined()) {
-            return '';
+            return static::SEPARATOR;
         }
 
         /** Otherwise, return a value if the range is an exact value. */

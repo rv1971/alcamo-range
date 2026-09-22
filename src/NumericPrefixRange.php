@@ -76,14 +76,14 @@ class NumericPrefixRange extends PrefixRange
         $len1 = strlen($this->min_);
         $len2 = strlen($range->min_);
 
-        if($len1 < $len2) {
+        if ($len1 < $len2) {
             return $this->touches2(
                 str_pad($this->min_, $len2, '0'),
                 str_pad($this->max_, $len2, '9'),
                 $range->min_,
                 $range->max_
             );
-        } elseif($len1 > $len2) {
+        } elseif ($len1 > $len2) {
             return $this->touches2(
                 $this->min_,
                 $this->max_,
@@ -109,14 +109,14 @@ class NumericPrefixRange extends PrefixRange
         $len1 = strlen($this->min_);
         $len2 = strlen($range->min_);
 
-        if($len1 < $len2) {
+        if ($len1 < $len2) {
             return $this->createUnionWith2(
                 str_pad($this->min_, $len2, '0'),
                 str_pad($this->max_, $len2, '9'),
                 $range->min_,
                 $range->max_
             );
-        } elseif($len1 > $len2) {
+        } elseif ($len1 > $len2) {
             return $this->createUnionWith2(
                 $this->min_,
                 $this->max_,

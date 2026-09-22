@@ -15,6 +15,46 @@ use alcamo\exception\OutOfRange;
  */
 class StringRange extends AbstractRange
 {
+    public static function compare($range1, $range2)
+    {
+        $min1 = $range1->getMin();
+        $min2 = $range2->getMin();
+
+        /* Ensure comparison is string-based, not number-based. */
+
+        switch (true) {
+            case !isset($min2):
+                return 1;
+
+            case "x$min1" < "x$min2":
+                return -1;
+
+            case "x$min1" > "x$min2":
+                return 1;
+
+            default:
+                $max1 = $range1->getMax();
+                $max2 = $range2->getMax();
+
+                switch (true) {
+                    case isset($max1) && !isset($max2):
+                        return -1;
+
+                    case !isset($max1) && isset($max2):
+                        return 1;
+
+                    case "x$max1" < "x$max2":
+                        return -1;
+
+                    case "x$max1" > "x$max2":
+                        return 1;
+
+                    default:
+                        return 0;
+                }
+        }
+    }
+
     public function __construct(?string $min = null, ?string $max = null)
     {
         /** @throw alcamo::exception::OutOfRange if $max is less than $min. */

@@ -3,7 +3,6 @@
 namespace alcamo\range;
 
 use PHPUnit\Framework\TestCase;
-
 use alcamo\exception\{OutOfRange, SyntaxError};
 
 class NumericPrefixRangeTest extends TestCase
@@ -11,7 +10,8 @@ class NumericPrefixRangeTest extends TestCase
     /**
      * @dataProvider newFromStringProvider
      */
-    public function testConstruct($min, $max, $expectedString): void {
+    public function testConstruct($min, $max, $expectedString): void
+    {
         $range = new NumericPrefixRange($min, $max);
 
         $this->assertSame($expectedString, (string)$range);

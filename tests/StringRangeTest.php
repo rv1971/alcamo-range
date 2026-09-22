@@ -47,8 +47,8 @@ class StringRangeTest extends TestCase
     public function newFromStringProvider(): array
     {
         return [
-            'undefined1' => [ '', '', null, '', false, false, false ],
-            'undefined2' => [ '-', '', null, '', false, false, false ],
+            'undefined1' => [ '', '', null, '-', false, false, false ],
+            'undefined2' => [ '-', '', null, '-', false, false, false ],
             'exact' => [ 'foo', 'foo', 'foo', 'foo', true, true, true ],
             'left'  => [ 'foo-', 'foo', null, 'foo-', true, false, false ],
             'right' => [ '-bar', '', 'bar', '-bar', true, true, false ],
