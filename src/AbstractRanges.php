@@ -38,7 +38,7 @@ abstract class AbstractRanges extends ReadonlyCollection
      */
     protected function __construct(array $ranges)
     {
-        parent::__construct($this->normalize($ranges));
+        parent::__construct($ranges ? $this->normalize($ranges) : []);
     }
 
     public function __toString(): string

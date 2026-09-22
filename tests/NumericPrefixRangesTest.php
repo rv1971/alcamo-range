@@ -38,4 +38,30 @@ class NumericPrefixRangesTest extends TestCase
             [ [ '-1234', '-13', '789-999' ], '00-13 789-999' ]
         ];
     }
+
+    /**
+     * @dataProvider cropProvider
+     */
+    public function testCrop($rangeStrings, $maxLength, $expectedStr): void
+    {
+        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings)
+            ->crop($maxLength);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+
+        shuffle($rangeStrings);
+
+        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings)
+            ->crop($maxLength);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+    }
+
+    public function cropProvider(): array
+    {
+        return [
+            [ [], 3, '' ],
+            [ [ '1234-5678', '568', '569', '5702-58' ], 3, '123-589' ]
+        ];
+    }
 }

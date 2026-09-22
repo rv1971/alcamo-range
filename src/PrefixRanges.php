@@ -13,4 +13,16 @@ namespace alcamo\range;
 class PrefixRanges extends AbstractRanges
 {
     public const ITEM_CLASS = PrefixRange::class;
+
+    /// Return new collection with all bounds cropped to given maxLength
+    public function crop(int $maxLength): self
+    {
+        $ranges = [];
+
+        foreach ($this as $range) {
+            $ranges[] = $range->crop($maxLength);
+        }
+
+        return new static($ranges);
+    }
 }

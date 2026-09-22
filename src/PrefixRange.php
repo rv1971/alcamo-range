@@ -95,15 +95,14 @@ class PrefixRange extends StringRange
         );
     }
 
-    /// Return new object with borders cropped to given maxLength
+    /// Return new object with bounds cropped to given maxLength
     public function crop(int $maxLength): self
     {
         return new static(
             substr($this->min_, 0, $maxLength),
-            substr($this->max_, 0, $maxLength)
+            isset($this->max_) ? substr($this->max_, 0, $maxLength) : null
         );
     }
-
 
     protected function inc(?string $value)
     {

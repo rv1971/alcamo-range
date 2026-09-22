@@ -10,7 +10,7 @@ namespace alcamo\range;
  *
  * @date Last reviewed 2026-09-22
  */
-class NumericPrefixRanges extends AbstractRanges
+class NumericPrefixRanges extends PrefixRanges
 {
     public const ITEM_CLASS = NumericPrefixRange::class;
 }

@@ -42,4 +42,39 @@ class PrefixRangesTest extends TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider cropProvider
+     */
+    public function testCrop($rangeStrings, $maxLength, $expectedStr): void
+    {
+        $ranges =
+            PrefixRanges::newFromIterable($rangeStrings)->crop($maxLength);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+
+        shuffle($rangeStrings);
+
+        $ranges =
+            PrefixRanges::newFromIterable($rangeStrings)->crop($maxLength);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+    }
+
+    public function cropProvider(): array
+    {
+        return [
+            [ [], 7, '' ],
+            [ [ 'bar-foo', '-' ], 7, '-' ],
+            [ [ 'bar-foo', '-' ], 2, '-' ],
+            [ [ '-bar', 'bar-foo', 'fooxx-' ], 4, '-foo foox-' ],
+            [ [ '-bar', 'bar-foo', 'fooxx-' ], 3, '-' ],
+            [ [ '-bar', '-baz', 'foo-qux' ], 2, '-ba fo-qu' ],
+            [
+                [ 'bar-baz', 'c', 'doo-foo', 'h', 'iabcd-kdefg' ],
+                1,
+                'b-f h-k'
+            ]
+        ];
+    }
 }

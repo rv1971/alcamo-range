@@ -186,6 +186,7 @@ class PrefixRangeTest extends TestCase
     {
         return [
             [ '', 7, '' ],
+            [ 'corge-', 2, 'co-' ],
             [ 'bar-quux', 4, 'bar-quux' ],
             [ 'bar-quux', 3, 'bar-quu' ],
             [ 'bar-quux', 1, 'b-q' ]
