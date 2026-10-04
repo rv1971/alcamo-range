@@ -7,11 +7,11 @@ use PHPUnit\Framework\TestCase;
 class IntegerRangesTest extends TestCase
 {
     /**
-     * @dataProvider newFromStringProvider
+     * @dataProvider newFromRangeIterableProvider
      */
-    public function testNewFromIterable($rangeStrings, $expectedStr): void
+    public function testNewFromRangeIterable($rangeStrings, $expectedStr): void
     {
-        $ranges = IntegerRanges::newFromIterable($rangeStrings);
+        $ranges = IntegerRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
 
@@ -21,12 +21,12 @@ class IntegerRangesTest extends TestCase
 
         shuffle($rangeStrings);
 
-        $ranges = IntegerRanges::newFromIterable($rangeStrings);
+        $ranges = IntegerRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
     }
 
-    public function newFromStringProvider(): array
+    public function newFromRangeIterableProvider(): array
     {
         return [
             [ [], '' ],

@@ -7,35 +7,66 @@ use PHPUnit\Framework\TestCase;
 class NumericPrefixRangesTest extends TestCase
 {
     /**
-     * @dataProvider newFromStringProvider
+     * @dataProvider newFromRangeIterableProvider
      */
-    public function testNewFromIterable($rangeStrings, $expectedStr): void
+    public function testNewFromRangeIterable($rangeStrings, $expectedStr): void
     {
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
 
         foreach ($ranges as $key => $range) {
-            $this->assertSame($key, (string)$range);
+            $this->assertSame((string)$key, (string)$range);
         }
 
         shuffle($rangeStrings);
 
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
     }
 
-    public function newFromStringProvider(): array
+    public function newFromRangeIterableProvider(): array
     {
         return [
             [ [], '' ],
             [ [ '1234-789', '-' ], '0-9' ],
             [ [ '-1234', '1234-789', '789-' ], '0-9' ],
-            [ [ '-1234', '1234-789', '7902-' ], '00-78 7902-9999' ],
+            [
+                [ '-1234', '1234-789', '79001', '7902-' ],
+                '00-78 79001 7902-9999'
+            ],
             [ [ '-1234', '1234-789', '7891-' ], '0-9' ],
             [ [ '-789', '56-81', '1234-' ], '0-9' ],
             [ [ '-1234', '-13', '789-999' ], '00-13 789-999' ]
+        ];
+    }
+
+    /**
+     * @dataProvider newFromValueIterableProvider
+     */
+    public function testNewFromValueIterable($values, $expectedStr): void
+    {
+        $ranges = NumericPrefixRanges::newFromValueIterable($values);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+
+        foreach ($ranges as $key => $range) {
+            $this->assertSame((string)$key, (string)$range);
+        }
+
+        shuffle($values);
+
+        $ranges = NumericPrefixRanges::newFromValueIterable($values);
+
+        $this->assertSame($expectedStr, (string)$ranges);
+    }
+
+    public function newFromValueIterableProvider(): array
+    {
+        return [
+            [ [], '' ],
+            [ [ '2', '32', '33', '34', '7', '8' ], '2 32-34 7-8' ]
         ];
     }
 
@@ -44,14 +75,14 @@ class NumericPrefixRangesTest extends TestCase
      */
     public function testCrop($rangeStrings, $maxLength, $expectedStr): void
     {
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings)
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings)
             ->crop($maxLength);
 
         $this->assertSame($expectedStr, (string)$ranges);
 
         shuffle($rangeStrings);
 
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings)
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings)
             ->crop($maxLength);
 
         $this->assertSame($expectedStr, (string)$ranges);
@@ -70,13 +101,13 @@ class NumericPrefixRangesTest extends TestCase
      */
     public function testToArray($rangeStrings, $expectedArray): void
     {
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedArray, $ranges->toArray());
 
         shuffle($rangeStrings);
 
-        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+        $ranges = NumericPrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedArray, $ranges->toArray());
     }

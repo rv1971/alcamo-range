@@ -7,11 +7,11 @@ use PHPUnit\Framework\TestCase;
 class PrefixRangesTest extends TestCase
 {
     /**
-     * @dataProvider newFromStringProvider
+     * @dataProvider newFromRangeIterableProvider
      */
-    public function testNewFromIterable($rangeStrings, $expectedStr): void
+    public function testNewFromRangeIterable($rangeStrings, $expectedStr): void
     {
-        $ranges = PrefixRanges::newFromIterable($rangeStrings);
+        $ranges = PrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
 
@@ -21,12 +21,12 @@ class PrefixRangesTest extends TestCase
 
         shuffle($rangeStrings);
 
-        $ranges = PrefixRanges::newFromIterable($rangeStrings);
+        $ranges = PrefixRanges::newFromRangeIterable($rangeStrings);
 
         $this->assertSame($expectedStr, (string)$ranges);
     }
 
-    public function newFromStringProvider(): array
+    public function newFromRangeIterableProvider(): array
     {
         return [
             [ [], '' ],
@@ -49,14 +49,14 @@ class PrefixRangesTest extends TestCase
     public function testCrop($rangeStrings, $maxLength, $expectedStr): void
     {
         $ranges =
-            PrefixRanges::newFromIterable($rangeStrings)->crop($maxLength);
+            PrefixRanges::newFromRangeIterable($rangeStrings)->crop($maxLength);
 
         $this->assertSame($expectedStr, (string)$ranges);
 
         shuffle($rangeStrings);
 
         $ranges =
-            PrefixRanges::newFromIterable($rangeStrings)->crop($maxLength);
+            PrefixRanges::newFromRangeIterable($rangeStrings)->crop($maxLength);
 
         $this->assertSame($expectedStr, (string)$ranges);
     }

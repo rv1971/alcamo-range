@@ -17,7 +17,7 @@ abstract class AbstractRanges extends ReadonlyCollection
     /// Class of the items in the collection
     public const ITEM_CLASS = null;
 
-    public function newFromIterable(iterable $ranges)
+    public function newFromRangeIterable(iterable $ranges)
     {
         $ranges2 = [];
 
@@ -30,6 +30,19 @@ abstract class AbstractRanges extends ReadonlyCollection
         }
 
         return new static($ranges2);
+    }
+
+    public function newFromValueIterable(iterable $values)
+    {
+        $ranges = [];
+
+        $class = static::ITEM_CLASS;
+
+        foreach ($values as $value) {
+            $ranges[] = new $class($value, $value);
+        }
+
+        return static::newFromRangeIterable($ranges);
     }
 
     /**
