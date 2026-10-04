@@ -64,4 +64,31 @@ class NumericPrefixRangesTest extends TestCase
             [ [ '1234-5678', '568', '569', '5702-58' ], 3, '123-589' ]
         ];
     }
+
+    /**
+     * @dataProvider toArrayProvider
+     */
+    public function testToArray($rangeStrings, $expectedArray): void
+    {
+        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+
+        $this->assertSame($expectedArray, $ranges->toArray());
+
+        shuffle($rangeStrings);
+
+        $ranges = NumericPrefixRanges::newFromIterable($rangeStrings);
+
+        $this->assertSame($expectedArray, $ranges->toArray());
+    }
+
+    public function toArrayProvider(): array
+    {
+        return [
+            [ [], [] ],
+            [
+                [ '1-2', '4', '51', '6-72' ],
+                [ '1', '2', '4', '51', '6', '70', '71', '72' ]
+            ]
+        ];
+    }
 }

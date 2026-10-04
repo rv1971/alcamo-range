@@ -13,4 +13,16 @@ namespace alcamo\range;
 class NumericPrefixRanges extends PrefixRanges
 {
     public const ITEM_CLASS = NumericPrefixRange::class;
+
+    /// Create a minimal representation as a list of prefixes
+    public function toArray(): array
+    {
+        $result = [];
+
+        foreach ($this as $range) {
+            $range->toArray($result);
+        }
+
+        return $result;
+    }
 }

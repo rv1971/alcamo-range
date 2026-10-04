@@ -143,14 +143,23 @@ class NumericPrefixRange extends PrefixRange
             : null;
     }
 
-    /// Create a minimal representation as a list of prefixes
-    public function toArray(): array
+    /**
+     * @brief Create a minimal representation as a list of prefixes
+     *
+     * @param $result If set, data are appended to this array. Needed for
+     * efficient implementation of
+     * alcamo::range::NumericPrefixRanges::toArray().
+     */
+    public function toArray(?array &$result = null): array
     {
-        if ($this->isExactValue()) {
-            return [ $this->min_ ];
+        if (!isset($result)) {
+            $result = [];
         }
 
-        $result = [];
+        if ($this->isExactValue()) {
+            $result[] = $this->min_;
+            return $result;
+        }
 
         /*
          * For the following documentation, the bounds are subdivided as
