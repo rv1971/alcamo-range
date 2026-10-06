@@ -23,7 +23,8 @@ class PrefixRangeTest extends TestCase
             [ null, 'foo', '' ],
             [ 'bar', 'foo', '' ],
             [ 'bar', 'baz', 'ba' ],
-            [ 'baar', 'baazz', 'baa' ]
+            [ 'baar', 'baazz', 'baa' ],
+            [ '300', '305', '30' ]
         ];
     }
 

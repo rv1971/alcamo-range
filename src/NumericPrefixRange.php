@@ -178,7 +178,7 @@ class NumericPrefixRange extends PrefixRange
          * digit in $min */
         $pos = strlen(rtrim($min, '0')) - 1;
 
-        if ($pos >= 0) {
+        if ($pos > $commonPrefixLength) {
             for (; $pos > $commonPrefixLength; $pos--) {
                 $prefix = substr($min, 0, $pos);
 
